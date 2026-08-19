@@ -1,6 +1,7 @@
 import json
 import os
 import shlex
+import shutil
 import subprocess
 import tempfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -29,7 +30,11 @@ class BiosHandler(BaseHTTPRequestHandler):
 
         try:
             length = int(self.headers.get("Content-Length", "0"))
+            if length <= 0 or length > 30000:
+                raise ValueError("La solicitud supera el limite permitido.")
             payload = json.loads(self.rfile.read(length))
+            if not isinstance(payload, dict):
+                raise ValueError("El cuerpo debe ser un objeto JSON.")
             if self.path == "/api/chat":
                 result = brain.ask_result(payload.get("message", ""))
                 self._send_json(200, result)
@@ -54,15 +59,27 @@ class BiosHandler(BaseHTTPRequestHandler):
             file.write(code)
             script_path = file.name
         command = f"{executable} {shlex.quote(script_path)}; printf '\\nPulsa ENTER para cerrar...'; read"
-        if os.name != "posix" or subprocess.run(["which", "osascript"], capture_output=True).returncode != 0:
+        if os.name != "posix" or shutil.which("osascript") is None:
             raise RuntimeError("La ejecucion en Terminal esta disponible en macOS.")
-        subprocess.Popen(["osascript", "-e", f"tell application \"Terminal\" to do script {json.dumps(command)}"])
+        command = f"{command}; rm -f {shlex.quote(script_path)}"
+        subprocess.Popen(
+            [
+                "osascript",
+                "-e",
+                f"tell application \"Terminal\" to do script {json.dumps(command)}",
+            ]
+        )
         self._send_json(200, {"status": "terminal_opened"})
 
     def _serve_file(self, path):
         relative_path = path.removeprefix("/interfaz_bios/")
-        file_path = UI_ROOT / relative_path
-        if not file_path.is_file() or UI_ROOT not in file_path.parents:
+        file_path = (UI_ROOT / relative_path).resolve()
+        try:
+            file_path.relative_to(UI_ROOT.resolve())
+        except ValueError:
+            self._send_json(404, {"error": "Recurso no encontrado"})
+            return
+        if not file_path.is_file():
             self._send_json(404, {"error": "Recurso no encontrado"})
             return
         content_types = {".html": "text/html", ".css": "text/css", ".js": "text/javascript"}
