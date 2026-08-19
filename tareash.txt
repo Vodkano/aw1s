@@ -1,0 +1,187 @@
+TAREAS AW1 // CONFIGURACION EXTERNA Y SIGUIENTES PASOS
+=========================================================
+
+OBJETIVO
+--------
+El sistema debe:
+- recibir siempre la entrada por Ollama;
+- corregir entradas mal escritas o pedir aclaracion;
+- guardar el JSON de analisis sin mostrarlo;
+- consultar Wikipedia para personas y biografias;
+- pedir confirmacion SI/NO antes de usar GPT;
+- mantener memoria controlada y borrable;
+- poder desplegarse en la nube sin exponer secretos.
+
+1. LO QUE HARE YO
+-----------------
+
+No necesitas editar el codigo para estas tareas. Las implementare cuando me
+entregues la configuracion externa minima:
+
+[ ] Mejorar el clasificador de Ollama y su JSON interno.
+[ ] Normalizar ortografia, acentos y entradas incompletas.
+[ ] Crear el menu de confirmacion antes de usar GPT.
+[ ] Evitar GPT si no hay credito, clave o permiso del usuario.
+[ ] Integrar memoria de sesion y memoria persistente.
+[ ] Añadir guardar, consultar y borrar memoria.
+[ ] Preparar SQLite inicialmente.
+[ ] Añadir pruebas automaticas.
+[ ] Preparar Docker y configuracion de produccion.
+[ ] Preparar logs sin claves ni contenido sensible.
+[ ] Configurar limites, timeouts y manejo de errores.
+[ ] Preparar el despliegue en el proveedor que elijas.
+[ ] Mantener Wikipedia como fuente especializada para personas.
+
+2. LO QUE DEBES CONFIGURAR TU
+-----------------------------
+
+Estas acciones son externas al proyecto y requieren tus cuentas, pagos o
+permisos. Yo no puedo crearlas por ti:
+
+[ ] Elegir un proveedor cloud.
+
+    Opciones recomendadas:
+    - VPS: Hetzner, DigitalOcean, Linode o AWS Lightsail.
+    - PaaS: Render, Railway o Fly.io.
+
+    Para Ollama, un VPS con suficiente RAM es preferible. Una GPU es mejor
+    si esperas muchas consultas.
+
+[ ] Crear la cuenta del proveedor y activar facturacion.
+
+[ ] Crear el servidor.
+
+    Necesitare despues:
+    - proveedor;
+    - IP o dominio;
+    - region;
+    - sistema operativo;
+    - RAM y almacenamiento;
+    - usuario de despliegue;
+    - puerto SSH.
+
+[ ] Crear un repositorio privado en GitHub o GitLab.
+
+[ ] Opcional: registrar un dominio.
+
+[ ] Opcional: configurar DNS para apuntar el dominio al servidor.
+
+[ ] Decidir donde correra Ollama:
+
+    OLLAMA_LOCATION = local / vps / otro servidor
+
+[ ] Decidir el modelo local:
+
+    OLLAMA_MODEL = llama3.2:latest
+
+[ ] Decidir la memoria:
+
+    MEMORY = sesion / persistente / ambas
+
+    Recomendacion inicial: ambas, con resumenes y preferencias, no con toda
+    la conversacion completa.
+
+[ ] Decidir la base de datos:
+
+    DATABASE = sqlite / postgresql
+
+    Recomendacion inicial: SQLite. PostgreSQL si habra varios usuarios.
+
+[ ] Decidir si la interfaz publica necesitara autenticacion:
+
+    AUTHENTICATION = si / no
+
+    Recomendacion: si, si el servicio se expone fuera de tu ordenador.
+
+3. SECRETOS: LOS CARGAS TU DE FORMA SEGURA
+-------------------------------------------
+
+No escribas secretos en este archivo, en GitHub, en el codigo ni en el chat.
+Carga las claves directamente cuando el entorno este preparado.
+
+Localmente, la clave OpenAI puede guardarse con el gestor existente:
+
+    .venv/bin/python componentes/cerebro/key_manager.py
+
+En la nube, usa las variables secretas del proveedor o un gestor como:
+- variables secretas del PaaS;
+- AWS Secrets Manager;
+- 1Password Secrets Automation;
+- Vault.
+
+Variables necesarias en el entorno, nunca en archivos publicos:
+
+    OPENAI_API_KEY=secreto_de_openai
+    OLLAMA_HOST=http://127.0.0.1:11434
+    OLLAMA_MODEL=llama3.2:latest
+    APP_ENV=production
+
+La clave OpenAI solo sera necesaria si confirmas usar GPT y la cuenta tiene
+saldo. No necesito ver ni recibir el valor de la clave.
+
+4. INFORMACION NO SECRETA QUE NECESITO DE TI
+---------------------------------------------
+
+Completa solo estos valores:
+
+    CLOUD_PROVIDER =
+    SERVER_EXISTS = si / no
+    SERVER_IP_OR_DOMAIN =
+    SERVER_REGION =
+    SERVER_OS =
+    SERVER_RAM =
+    OLLAMA_LOCATION = local / vps / otro
+    OLLAMA_MODEL =
+    MEMORY = sesion / persistente / ambas
+    DATABASE = sqlite / postgresql
+    PRIVATE_REPOSITORY = si / no
+    AUTHENTICATION = si / no
+    DOMAIN = opcional
+
+Nunca envies:
+- claves API;
+- contraseñas;
+- claves privadas SSH;
+- tokens;
+- archivos .env reales.
+
+5. FLUJO DE CONFIRMACION GPT
+----------------------------
+
+Cuando Ollama no pueda responder con suficiente confianza, la interfaz debe
+mostrar solamente:
+
+    Ollama no tiene una respuesta segura.
+    ¿Quieres consultar GPT? [SI/NO]
+
+Comportamiento:
+- SI: se comprueba clave y saldo, y se consulta GPT.
+- NO: se responde con Ollama o se informa que no hay respuesta confiable.
+- sin clave o sin saldo: no se realiza la llamada y se informa claramente.
+- el JSON de analisis nunca se muestra al usuario.
+
+6. ORDEN RECOMENDADO
+--------------------
+
+[ ] 1. Elegir proveedor cloud.
+[ ] 2. Crear servidor y repositorio privado.
+[ ] 3. Decidir ubicacion de Ollama y memoria.
+[ ] 4. Enviarme la informacion no secreta de la seccion 4.
+[ ] 5. Yo preparo Docker, memoria, confirmacion GPT y pruebas.
+[ ] 6. Tu cargas las claves directamente en el entorno seguro.
+[ ] 7. Yo valido el despliegue sin ver las claves.
+[ ] 8. Probar localmente y despues publicar.
+
+7. CRITERIOS DE FINALIZACION
+----------------------------
+
+[ ] Ollama procesa siempre la primera entrada.
+[ ] Las faltas de ortografia no rompen el flujo.
+[ ] El JSON interno se almacena y no se muestra.
+[ ] Las preguntas sobre personas consultan Wikipedia.
+[ ] GPT requiere confirmacion explicita.
+[ ] GPT no se llama sin saldo o sin clave.
+[ ] La memoria puede borrarse.
+[ ] No hay secretos en el repositorio.
+[ ] La interfaz publicada usa HTTPS y autenticacion si corresponde.
+[ ] Hay pruebas automaticas y una prueba real de extremo a extremo.

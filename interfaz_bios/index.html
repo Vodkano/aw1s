@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AW1 // BIOS CONSOLE</title>
+  <link rel="stylesheet" href="/interfaz_bios/styles.css">
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">AW1 // BIOS CONSOLE</div>
+      <nav class="nav" aria-label="Secciones">
+        <button class="nav-button active" data-view="chat" type="button">CHAT</button>
+        <button class="nav-button" data-view="components" type="button">COMPONENTES</button>
+      </nav>
+      <div class="status"><span class="status-dot"></span> LOCAL READY</div>
+    </header>
+
+    <main class="main-frame">
+      <section class="view chat-view" data-panel="chat">
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">SYSTEM / LLM LINK</p>
+            <h1>LOCAL CHAT TERMINAL</h1>
+          </div>
+          <div class="telemetry">OLLAMA // ONLINE<br><span id="clock">--:--:--</span></div>
+        </div>
+
+        <div class="chat-window" id="chat-window" aria-live="polite">
+          <div class="message system-message">
+            <span class="message-label">SYSTEM</span>
+            <p>Canal local preparado. La primera lectura sera procesada por Ollama.</p>
+          </div>
+        </div>
+
+        <form class="composer" id="chat-form">
+          <label for="message-input">INPUT</label>
+          <textarea id="message-input" rows="2" placeholder="Escribe una instruccion..." required></textarea>
+          <button class="send-button" type="submit">TRANSMIT <span>&gt;</span></button>
+        </form>
+        <div class="hint">ENTER envia // SHIFT+ENTER nueva linea</div>
+      </section>
+
+      <section class="view components-view" data-panel="components" hidden>
+        <div class="screen-heading">
+          <div>
+            <p class="eyebrow">SYSTEM / INVENTORY</p>
+            <h1>COMPONENTES</h1>
+          </div>
+          <div class="telemetry">STATUS // EMPTY</div>
+        </div>
+        <div class="empty-panel" aria-label="Panel de componentes vacío"></div>
+      </section>
+    </main>
+
+    <footer class="footer"><span>AW1 CORE</span><span>ESC // RETURN</span><span>BUILD 01.00</span></footer>
+  </div>
+  <script src="/interfaz_bios/app.js"></script>
+</body>
+</html>
